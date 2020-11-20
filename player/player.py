@@ -11,6 +11,8 @@ class Player:
     def set_id(self, id):
         self.id = id 
            
+    def dead(self):
+        self.movable = False 
     def move(self, direction):
         return 
     

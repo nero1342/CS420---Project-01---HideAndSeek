@@ -11,6 +11,8 @@ def go(config):
     # Define map
     map = get_instance(config['map'])
     
+    graphic = get_instance(config['graphic'])
+
     # Define Player
     players = {}
     for pcfg in config['player']:
@@ -20,6 +22,7 @@ def go(config):
     
     # Define controller 
     game = GameController(  config= config,
+                            graphic= graphic,
                             map= map,
                             players = players) 
     

@@ -1,6 +1,9 @@
 id: Level 1
 controller: 
     time: 10
+graphic:
+    name: GraphicPygame
+    args:
 
 map:
     name: GameMap
@@ -8,7 +11,7 @@ map:
         path: input.txt 
 player:
     -   name: Seeker
-        count: 1
+        count: 2
         args:
             movable: True
             view_range: 3

@@ -1,7 +1,7 @@
 
 from map import *
 from player import *
-
+from graphic import *
 
 def get_function(name):
     return globals()[name]
