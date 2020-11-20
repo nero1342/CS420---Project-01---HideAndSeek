@@ -20,7 +20,7 @@ class GameMap:
     def __init__(self, path):
         super().__init__()
         self.load_map(path)
-        self.lst_obs = {Obstacle.WALL, Obstacle.OBSTACLE}
+        self.lst_obs = {1, 2}
         self.id = {}
     def load_map(self, path):
         with open(path, "r") as f:

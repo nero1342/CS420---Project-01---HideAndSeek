@@ -4,19 +4,20 @@ controller:
 graphic:
     name: GraphicPygame
     args:
+        data_image_dir: data_image
 
 map:
     name: GameMap
     args:
-        path: input.txt 
+        path: data_maps/map_0.txt
 player:
     -   name: Seeker
-        count: 2
+        count: 1
         args:
             movable: True
             view_range: 3
     -   name: Hider
-        count: 2
+        count: 1
         args:
             movable: False 
             view_range: 3
