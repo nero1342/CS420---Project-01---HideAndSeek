@@ -1,0 +1,13 @@
+id: Level 1
+game:
+    time:  
+map:
+    path: input.txt 
+player:
+    hider:
+        number: 1
+        movable: False 
+        view_range: 3
+    seeker:
+        view_range: 3
+        movable: True
