@@ -1,1 +1,1 @@
-from ..player import * 
+from .map import *

@@ -1,13 +1,22 @@
 id: Level 1
-game:
-    time:  
+controller: 
+    time: 10
+
 map:
-    path: input.txt 
+    name: GameMap
+    args:
+        path: input.txt 
 player:
-    hider:
-        number: 1
-        movable: False 
-        view_range: 3
-    seeker:
-        view_range: 3
-        movable: True
+    -   name: Seeker
+        count: 1
+        args:
+            movable: True
+            view_range: 3
+    -   name: Hider
+        count: 2
+        args:
+            movable: False 
+            view_range: 3
+
+    
+    # ... more metrics
