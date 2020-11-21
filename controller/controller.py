@@ -1,15 +1,28 @@
 import numpy as np 
+import pygame_menu
+from menu import Menu
+from utils.getter import *
 
 class GameController:
-    def __init__(self, config, map, players, graphic):
-        self.config = config
+    def __init__(self, config_path):
+        self.config_path = config_path
+
+    def get_player(self, turn_id):
+        return self.players[self.lst_player[turn_id]]
+
+    def init_game(self):
+        config = get_config(self.config_path)
         self.time = config['controller']['time']
-        self.graphic = graphic
-        self.map = map 
-        self.players = players 
+        self.graphic = get_instance(config['graphic'])
+        self.map = get_instance(config['map']) 
+        # [TODO]: Must refactor here
+        self.players = {}
+        for pcfg in config['player']:
+            for it in range(pcfg['count']):
+                self.players[pcfg['name'] + '_' + str(it)] = get_instance(pcfg)
         self.lst_player = list(self.players.keys())
         self.type_player_alive = {}
-        for player in players.values():
+        for player in self.players.values():
             if (self.type_player_alive.get(player.__class__.__name__)):
                 self.type_player_alive[player.__class__.__name__] += 1
             else:
@@ -17,10 +30,6 @@ class GameController:
         print(self.type_player_alive)
         print(self.lst_player)
 
-    def get_player(self, turn_id):
-        return self.players[self.lst_player[turn_id]]
-
-    def init_game(self):
         for i in range(len(self.lst_player)):
             pos = self.map.get_free_cell()
             player = self.get_player(i) 
@@ -36,6 +45,23 @@ class GameController:
             self.take_turn(player)
             return True 
         return False 
+    
+    def set_level(self, level_name, level_id, config_path):
+        self.config_path = config_path
+        print(self.config_path)
+
+    def start(self):
+        if self.config_path is None:
+            menu = Menu()
+            cb_list = {
+                'select_level_cb': self.set_level,
+                'play_cb': self.run_game
+            }
+            menu.create_menu(cb_list)
+            menu.display()
+        else:
+            self.run_game()
+
     def run_game(self):
         self.init_game()
         turn_id = 0
@@ -50,6 +76,7 @@ class GameController:
             self.time -= 1
         pass
         self.graphic.extract_video()
+        self.graphic.reset_screen()
 
     def check_stop_game(self):
         alive = []
