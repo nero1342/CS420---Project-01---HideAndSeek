@@ -1,6 +1,6 @@
 id: Level 1
 controller: 
-    time: 10
+    time: 10000
 graphic:
     name: GraphicPygame
     args:
@@ -9,7 +9,7 @@ graphic:
 map:
     name: GameMap
     args:
-        path: data_maps/map_0.txt
+        path: data_maps/map_2.txt
 player:
     -   name: Seeker
         count: 1
@@ -17,7 +17,7 @@ player:
             movable: True
             view_range: 3
     -   name: Hider
-        count: 1
+        count: 10
         args:
             movable: False 
             view_range: 3

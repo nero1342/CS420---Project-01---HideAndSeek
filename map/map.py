@@ -3,25 +3,29 @@ from enum import Enum
 
 import copy 
 
-class Direction:
-    def __init__(self):
-        self.x = [0, 0, 0, 1, 1, 1, -1, -1, -1]
-        self.y = [0, -1, 1, 0, -1, 1, 0, -1, 1]
-
-    def __getitem__(self, id):
-        return(self.x[id], self.y[id]) 
-
 class Obstacle(Enum):
     WALL = 1
     OBSTACLE = 2
 
 
 class GameMap:
+    class Direction:
+        def __init__(self):
+            self.x = [0, 0, 0, 1, 1, 1, -1, -1, -1]
+            self.y = [0, -1, 1, 0, -1, 1, 0, -1, 1]
+
+        def __getitem__(self, id):
+            return(self.x[id], self.y[id]) 
+
+        def __len__(self):
+            return len(self.x)
+            
     def __init__(self, path):
         super().__init__()
         self.load_map(path)
         self.lst_obs = {1, 2}
         self.id = {}
+
     def load_map(self, path):
         with open(path, "r") as f:
             r, c = list(map(int, f.readline().split()))
@@ -69,6 +73,9 @@ class GameMap:
                 if not self.in_view(player, (i, j)):
                     if (view.is_player_here((i, j))): 
                         view.map[i][j] = 0
+                else:
+                    if view.map[i][j] == 0:
+                        view.map[i][j] = -1
         return view
 
 
@@ -85,8 +92,8 @@ class GameMap:
     def move(self, player, direction):
         # Return list of Players is dead after this move
         x, y = player.position
-        newX = x + Direction()[direction][0] 
-        newY = y + Direction()[direction][1]
+        newX = x + self.Direction()[direction][0] 
+        newY = y + self.Direction()[direction][1]
         ret = []
 
         if (self.valid((newX, newY))):
@@ -97,6 +104,7 @@ class GameMap:
                 if (player.__class__.__name__ == "Seeker" 
                     and self.id[self.map[newX][newY]] == "Hider"):
                     ret.append(self.map[newX][newY] - 3) 
+                    print("Seeker -> Hider")
             print("Move from ({}, {}) to ({},{})".format(x, y, newX, newY))
             player.set_position((newX, newY))
             self.map[newX][newY] = self.map[x][y]
