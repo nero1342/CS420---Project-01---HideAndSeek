@@ -73,7 +73,9 @@ class GraphicPygame:
         seconds = 10
         
         fourcc = VideoWriter_fourcc(*'MP42')
-        video = VideoWriter('./test.avi', fourcc, float(FPS), (width, height))
+        level_name = 'test' # must change to name of level
+        path_to_save = os.path.join('./outputs', level_name, 'avi')
+        video = VideoWriter(path_to_save, fourcc, float(FPS), (width, height))
 
         for i, frame in enumerate(self.whole_game):
             print("Extract frame {}".format(i))
@@ -82,3 +84,6 @@ class GraphicPygame:
             video.write(frame)
 
         video.release()
+    
+    def reset_screen(self):
+        pg.display.set_mode((400, 300), 0, 32)

@@ -1,0 +1,7 @@
+numpy==1.19.4
+opencv-python==4.4.0.46
+pyaml==20.4.0
+pygame==2.0.0
+pygame-menu==3.3.0
+pyperclip==1.8.1
+PyYAML==5.3.1

@@ -1,0 +1,26 @@
+id: Level 1
+controller: 
+    time: 10000
+graphic:
+    name: GraphicPygame
+    args:
+        data_image_dir: data_image
+
+map:
+    name: GameMap
+    args:
+        path: data_maps/map_2.txt
+player:
+    -   name: Seeker
+        count: 1
+        args:
+            movable: True
+            view_range: 3
+    -   name: Hider
+        count: 10
+        args:
+            movable: False 
+            view_range: 3
+
+    
+    # ... more metrics
