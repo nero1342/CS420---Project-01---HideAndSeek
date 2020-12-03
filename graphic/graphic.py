@@ -4,6 +4,8 @@ import numpy as np
 import os 
 from enum import Enum 
 class Type(Enum):
+    STREET_IN_HIDER_VIEW = -2
+    STREET_IN_SEEKER_VIEW = -1
     STREET = 0
     WALL = 1
     OBSTACLE = 2 
@@ -15,20 +17,23 @@ class GraphicPygame:
         super().__init__()
         self.data_image_dir = data_image_dir
         self.img = {}
-        
+        self.img[Type.STREET_IN_HIDER_VIEW] = pg.image.load(os.path.join(data_image_dir, "pink.png"))
+        self.img[Type.STREET_IN_SEEKER_VIEW] = pg.image.load(os.path.join(data_image_dir, "white.png"))
+        self.img[Type.STREET] = pg.image.load(os.path.join(data_image_dir, "street.jpg"))
         self.img[Type.WALL] = pg.image.load(os.path.join(data_image_dir, "wall.png"))
         self.img[Type.OBSTACLE] = pg.image.load(os.path.join(data_image_dir, "obstacle.png"))
         self.img[Type.SEEKER] = pg.image.load(os.path.join(data_image_dir, "monkey.png"))
         self.img[Type.HIDER] = pg.image.load(os.path.join(data_image_dir, "pig.png"))
-        # self.img[Type.HIDER2] = pg.image.load(os.path.join(data_image_dir, "pig.png"))
+        self.img[Type.HIDER2] = pg.image.load(os.path.join(data_image_dir, "monkey2.png"))
         pg.init() 
         pg.display.set_caption('Hide and Seek')
         
         self.whole_game = []
     def draw(self, game_map):
+        block = 17
         n_row = len(game_map)
         n_col = len(game_map[0])
-        WINDOW_SIZE = (n_col * 32 + 10, n_row * 32 + 10)
+        WINDOW_SIZE = (n_col * block * 2 + 10, n_row * block * 2 + 10)
         self.WS = WINDOW_SIZE
         screen = pg.display.set_mode(WINDOW_SIZE, 0, 32)
         display = pg.Surface((WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2))
@@ -39,9 +44,15 @@ class GraphicPygame:
         for i in range(n_row):
             for j in range(n_col):
                 id = min(4, int(game_map[i][j]))#self.getID(game_map[i][j])
+                # id = max(0, id)
                 # print(n_row, n_col, id, self.img[Type(id)])
-                if id:
-                    display.blit(self.img[Type(id)], (j * 16, i * 16))
+                if id != 0:
+                    if Type(id) == Type.HIDER:
+                        display.blit(self.img[Type.STREET_IN_HIDER_VIEW], (j * block, i * block))
+                    
+                    if Type(id) == Type.SEEKER:
+                        display.blit(self.img[Type.STREET_IN_SEEKER_VIEW], (j * block, i * block))
+                    display.blit(self.img[Type(id)], (j * block, i * block))
         
         pg.time.Clock().tick(10)
         screen.blit(pg.transform.scale(display, WINDOW_SIZE), (0, 0))
@@ -58,7 +69,7 @@ class GraphicPygame:
 
         width = self.WS[0]
         height = self.WS[1]
-        FPS = 24
+        FPS = 10
         seconds = 10
         
         fourcc = VideoWriter_fourcc(*'MP42')

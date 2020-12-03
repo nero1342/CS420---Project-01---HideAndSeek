@@ -9,7 +9,7 @@ graphic:
 map:
     name: GameMap
     args:
-        path: data_maps/map_2.txt
+        path: data_maps/map_1.txt
 player:
     -   name: Seeker
         count: 1
@@ -17,7 +17,7 @@ player:
             movable: True
             view_range: 3
     -   name: Hider
-        count: 1
+        count: 5
         args:
             movable: False 
             view_range: 3

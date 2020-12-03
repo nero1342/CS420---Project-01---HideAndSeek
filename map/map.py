@@ -13,6 +13,9 @@ class GameMap:
         def __init__(self):
             self.x = [0, 0, 0, 1, 1, 1, -1, -1, -1]
             self.y = [0, -1, 1, 0, -1, 1, 0, -1, 1]
+            
+            
+        pass 
 
         def __getitem__(self, id):
             return(self.x[id], self.y[id]) 
@@ -25,6 +28,25 @@ class GameMap:
         self.load_map(path)
         self.lst_obs = {1, 2}
         self.id = {}
+
+        self.nxt = {
+                0: {1, 4, 5},
+                1: {2},
+                2: {3},
+                3: {},
+                4: {8},
+                5: {6, 9, 10},
+                6: {7, 11},
+                7: {},
+                8: {12},
+                9: {13, 14},
+                10: {15},
+                11: {},
+                12: {},
+                13: {},
+                14: {},
+                15: {}
+            }
 
     def load_map(self, path):
         with open(path, "r") as f:
@@ -64,18 +86,70 @@ class GameMap:
         r = player.view_range  
         i, j = target
         return max(abs(x - i),abs(y - j)) <= r
-
+    
+    
     def get_view(self, player):
+        dirx = (1, 1, -1, -1)
+        diry = (1, -1, 1, -1)
+        x, y = player.position
+        r = player.view_range 
         view = copy.deepcopy(self)
         for i in range(self.size[0]):
             for j in range(self.size[1]):
                 # Setting view here
-                if not self.in_view(player, (i, j)):
-                    if (view.is_player_here((i, j))): 
-                        view.map[i][j] = 0
+                if (view.is_player_here((i, j))): 
+                    view.map[i][j] = 0
+        for p in range(4):
+            lst = []
+            for i in range(r + 1):
+                for j in range(r + 1):
+                    pos = (i * dirx[p] + x, j * diry[p] + y) 
+                    lst.append(pos)
+            in_view = [0] * len(lst)
+            in_view[0] = 1
+            for i in range(len(lst)):
+                pos = lst[i]
+                if in_view[i] == 0:
+                    continue 
+                if (self.inside(pos) and self.map[pos[0]][pos[1]] in self.lst_obs):
+                    continue
+                if (self.map[pos[0]][pos[1]] == 0):
+                    view.map[pos[0]][pos[1]] = -1
                 else:
-                    if view.map[i][j] == 0:
-                        view.map[i][j] = -1
+                    view.map[pos[0]][pos[1]] = self.map[pos[0]][pos[1]]
+                for j in self.nxt[i]:
+                    in_view[j] = 1
+            print(in_view)
+        return view
+    
+    def get_system_view(self, players):
+        dirx = (1, 1, -1, -1)
+        diry = (1, -1, 1, -1)
+        view = copy.deepcopy(self)
+        for player in players:
+            x, y = player.position
+            r = player.view_range 
+            for p in range(4):
+                lst = []
+                for i in range(r + 1):
+                    for j in range(r + 1):
+                        pos = (i * dirx[p] + x, j * diry[p] + y) 
+                        lst.append(pos)
+                in_view = [0] * len(lst)
+                in_view[0] = 1
+                for i in range(len(lst)):
+                    pos = lst[i]
+                    if in_view[i] == 0:
+                        continue 
+                    if (self.inside(pos) and self.map[pos[0]][pos[1]] in self.lst_obs):
+                        continue
+                    if (self.map[pos[0]][pos[1]] == 0):
+                        view.map[pos[0]][pos[1]] = -1
+                    else: 
+                        view.map[pos[0]][pos[1]] = self.map[pos[0]][pos[1]]
+                    for j in self.nxt[i]:
+                        in_view[j] = 1
+                # print(in_view)
         return view
 
 

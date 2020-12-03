@@ -40,14 +40,19 @@ class GameController:
         self.init_game()
         turn_id = 0
         while self.time > 0:
+            # self.graphic.draw(self.map.get_system_view(self.get_player(turn_id)).map)
+            # continue
             if self.run_turn(turn_id):
-                self.graphic.draw(self.map.map)
+                self.graphic.draw(self.map.get_system_view(self.players.values()).map)
+                # continue
+                #self.graphic.draw(self.get_player(turn_id).visited_map.map)
+                #self.graphic.draw(self.map.map)
                 winner = self.check_stop_game()
                 if winner is not None:
                     print("Winner is ", winner)
                     break
             turn_id = (turn_id + 1) % (len(self.lst_player))
-            self.time -= 1
+            # self.time -= 1
         pass
         self.graphic.extract_video()
 
