@@ -92,7 +92,12 @@ class GameMap:
         dirx = (1, 1, -1, -1)
         diry = (1, -1, 1, -1)
         x, y = player.position
-        r = player.view_range 
+        r = player.view_range
+        if type(player).__name__ == 'Hider':
+            view_value = -2
+        else:
+            view_value = -1
+        print(player.id)
         view = copy.deepcopy(self)
         for i in range(self.size[0]):
             for j in range(self.size[1]):
@@ -114,7 +119,7 @@ class GameMap:
                 if (self.inside(pos) and self.map[pos[0]][pos[1]] in self.lst_obs):
                     continue
                 if (self.map[pos[0]][pos[1]] == 0):
-                    view.map[pos[0]][pos[1]] = -1
+                    view.map[pos[0]][pos[1]] = view_value
                 else:
                     view.map[pos[0]][pos[1]] = self.map[pos[0]][pos[1]]
                 for j in self.nxt[i]:
@@ -128,7 +133,14 @@ class GameMap:
         view = copy.deepcopy(self)
         for player in players:
             x, y = player.position
+            if player.is_dead:
+                continue
             r = player.view_range 
+            # Get view street value. if hider so view = -2, player  view = -1
+            if type(player).__name__ == 'Hider':
+                view_value = -2
+            else:
+                view_value = -1
             for p in range(4):
                 lst = []
                 for i in range(r + 1):
@@ -143,8 +155,10 @@ class GameMap:
                         continue 
                     if (self.inside(pos) and self.map[pos[0]][pos[1]] in self.lst_obs):
                         continue
-                    if (self.map[pos[0]][pos[1]] == 0):
-                        view.map[pos[0]][pos[1]] = -1
+                    if -4 < view.map[pos[0]][pos[1]] < 0 and view.map[pos[0]][pos[1]] != view_value:
+                        view.map[pos[0]][pos[1]] = -3
+                    elif self.map[pos[0]][pos[1]] == 0:
+                        view.map[pos[0]][pos[1]] = view_value
                     else: 
                         view.map[pos[0]][pos[1]] = self.map[pos[0]][pos[1]]
                     for j in self.nxt[i]:
@@ -152,15 +166,30 @@ class GameMap:
                 # print(in_view)
         return view
 
-
+    def update_announce_cell(self, list_announce_cell):
+        for i in range(len(self.map)):
+            for j in range(len(self.map[i])):
+                if self.map[i][j] < -3:
+                    self.map[i][j] = 0
+        for cell in list_announce_cell:
+            self.map[cell[0][0]][cell[0][1]] = cell[1]
+    
+    def clear_announce_cell(self):
+        for i in range(len(self.map)):
+            for j in range(len(self.map[i])):
+                if self.map[i][j] < -3:
+                    self.map[i][j] = 0
+  
     def get_free_cell(self):
         free = [(i, j) for i in range(self.size[0]) for j in range(self.size[1]) if self.map[i][j] == 0]
         indice = random.choice(free)
         return indice
-
+    def is_announce_cell(self, pos):
+        return self.map[pos[0]][pos[1]] not in [1, 2] 
     def set_player_position(self, player, id):
         pos = player.position
         self.map[pos[0]][pos[1]] = id + 3 
+        print(id+3)
         self.id[id + 3] = player.__class__.__name__ 
 
     def move(self, player, direction):
