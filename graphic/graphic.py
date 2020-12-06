@@ -4,19 +4,23 @@ import numpy as np
 import os 
 from enum import Enum 
 class Type(Enum):
+    ANNOUNCE_VIEW = -4
+    STREET_IN_OVERLAP_VIEW = -3
     STREET_IN_HIDER_VIEW = -2
     STREET_IN_SEEKER_VIEW = -1
     STREET = 0
     WALL = 1
     OBSTACLE = 2 
     SEEKER = 3
-    HIDER = 4 
+    HIDER = 4
     HIDER2 = 5
 class GraphicPygame:
     def __init__(self, data_image_dir):
         super().__init__()
         self.data_image_dir = data_image_dir
         self.img = {}
+        self.img[Type.ANNOUNCE_VIEW] = pg.image.load(os.path.join(data_image_dir, "monkey2.png"))
+        self.img[Type.STREET_IN_OVERLAP_VIEW] = pg.image.load(os.path.join(data_image_dir, "yellow.png"))
         self.img[Type.STREET_IN_HIDER_VIEW] = pg.image.load(os.path.join(data_image_dir, "pink.png"))
         self.img[Type.STREET_IN_SEEKER_VIEW] = pg.image.load(os.path.join(data_image_dir, "white.png"))
         self.img[Type.STREET] = pg.image.load(os.path.join(data_image_dir, "street.jpg"))
@@ -47,11 +51,14 @@ class GraphicPygame:
                 # id = max(0, id)
                 # print(n_row, n_col, id, self.img[Type(id)])
                 if id != 0:
-                    if Type(id) == Type.HIDER:
-                        display.blit(self.img[Type.STREET_IN_HIDER_VIEW], (j * block, i * block))
+                    if id < -3:
+                        display.blit(self.img[Type.ANNOUNCE_VIEW], (j * block, i * block))
+                        continue
+                    # if Type(id) == Type.HIDER:
+                    #     display.blit(self.img[Type.STREET_IN_HIDER_VIEW], (j * block, i * block))
                     
-                    if Type(id) == Type.SEEKER:
-                        display.blit(self.img[Type.STREET_IN_SEEKER_VIEW], (j * block, i * block))
+                    # if Type(id) == Type.SEEKER:
+                    #     display.blit(self.img[Type.STREET_IN_SEEKER_VIEW], (j * block, i * block))
                     display.blit(self.img[Type(id)], (j * block, i * block))
         
         pg.time.Clock().tick(10)

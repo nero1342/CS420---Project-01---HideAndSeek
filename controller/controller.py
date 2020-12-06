@@ -2,6 +2,8 @@ import numpy as np
 import pygame_menu
 from menu import Menu
 from utils.getter import *
+import time
+import random
 
 class GameController:
     def __init__(self, config_path):
@@ -15,7 +17,6 @@ class GameController:
         self.time = config['controller']['time']
         self.graphic = get_instance(config['graphic'])
         self.map = get_instance(config['map']) 
-        # [TODO]: Must refactor here
         self.players = {}
         for pcfg in config['player']:
             for it in range(pcfg['count']):
@@ -35,6 +36,7 @@ class GameController:
             player = self.get_player(i) 
             player.set_position(pos)
             player.set_id(i)
+            print(i, self.lst_player[i])
             self.map.set_player_position(player, i)
         self.map.print_map()
         
@@ -64,10 +66,19 @@ class GameController:
 
     def run_game(self):
         self.init_game()
+        # return
         turn_id = 0
+        announce_turn = random.randint(7, 11)
         while self.time > 0:
             # self.graphic.draw(self.map.get_system_view(self.get_player(turn_id)).map)
             # continue
+            if announce_turn == 0:
+                list_announce_cell = self.get_announce_list()
+                self.map.update_announce_cell(list_announce_cell)
+                self.graphic.draw(self.map.get_system_view(self.players.values()).map)
+                self.map.clear_announce_cell()
+                time.sleep(1)
+                announce_turn = random.randint(5, 10)
             if self.run_turn(turn_id):
                 self.graphic.draw(self.map.get_system_view(self.players.values()).map)
                 # continue
@@ -77,12 +88,33 @@ class GameController:
                 if winner is not None:
                     print("Winner is ", winner)
                     break
+                if turn_id == 0:
+                    announce_turn -= 1
             turn_id = (turn_id + 1) % (len(self.lst_player))
             # self.time -= 1
         pass
         self.graphic.extract_video()
         self.graphic.reset_screen()
 
+    def get_announce_list(self):
+        list_announce_cell = []
+        for i in range(len(self.lst_player)):
+            player = self.players[self.lst_player[i]]
+            if type(player).__name__ == 'Hider' and self.map.alive(player):
+                pos = player.position
+                possible_cell = []
+                for i in range(-3, 4):
+                    for j in range(-3, 4):
+                        if abs(i) + abs(j) > 3 or i + j == 0:
+                            continue
+                        cell = (pos[0] + i, pos[1] + j)
+                        if self.map.valid((pos[0] + i, pos[1] + j)) and self.map.is_announce_cell(cell):
+                            possible_cell.append(cell)
+                if len(possible_cell) > 0:
+                    announce_cell = random.choice(possible_cell)
+                    list_announce_cell.append((announce_cell, -player.id - 3))
+                    player.update_announce_cell(announce_cell)
+        return list_announce_cell
     def check_stop_game(self):
         alive = []
         for type, cnt in self.type_player_alive.items():
