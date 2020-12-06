@@ -6,19 +6,23 @@ import numpy as np
 import os 
 from enum import Enum 
 class Type(Enum):
+    ANNOUNCE_VIEW = -4
+    STREET_IN_OVERLAP_VIEW = -3
     STREET_IN_HIDER_VIEW = -2
     STREET_IN_SEEKER_VIEW = -1
     STREET = 0
     WALL = 1
     OBSTACLE = 2 
     SEEKER = 3
-    HIDER = 4 
+    HIDER = 4
     HIDER2 = 5
 class GraphicPygame:
     def __init__(self, data_image_dir):
         super().__init__()
         self.data_image_dir = data_image_dir
         self.img = {}
+        self.img[Type.ANNOUNCE_VIEW] = pg.image.load(os.path.join(data_image_dir, "monkey2.png"))
+        self.img[Type.STREET_IN_OVERLAP_VIEW] = pg.image.load(os.path.join(data_image_dir, "yellow.png"))
         self.img[Type.STREET_IN_HIDER_VIEW] = pg.image.load(os.path.join(data_image_dir, "pink.png"))
         self.img[Type.STREET_IN_SEEKER_VIEW] = pg.image.load(os.path.join(data_image_dir, "white.png"))
         self.img[Type.STREET] = pg.image.load(os.path.join(data_image_dir, "street.jpg"))
@@ -26,14 +30,14 @@ class GraphicPygame:
         self.img[Type.OBSTACLE] = pg.image.load(os.path.join(data_image_dir, "obstacle.png"))
         self.img[Type.SEEKER] = pg.image.load(os.path.join(data_image_dir, "monkey.png"))
         self.img[Type.HIDER] = pg.image.load(os.path.join(data_image_dir, "pig.png"))
-        self.img[Type.HIDER2] = pg.image.load(os.path.join(data_image_dir, "monkey2.png"))
+        #self.img[Type.HIDER2] = pg.image.load(os.path.join(data_image_dir, "monkey2.png"))
         pg.init() 
         pg.display.set_caption('Hide and Seek')
         window = Window.from_display_module()
         window.position = (0, 0)
         self.whole_game = []
         self.cnt  = 0
-    def draw(self, game_map):
+    def draw(self, game_map, time_tick = 60):
         block = 17
         n_row = len(game_map)
         n_col = len(game_map[0])
@@ -55,11 +59,14 @@ class GraphicPygame:
                 running = False
         for i in range(n_row):
             for j in range(n_col):
-                id = max(-2, int(game_map[i][j]))#self.getID(game_map[i][j])
+                id = max(-4, int(game_map[i][j]))#self.getID(game_map[i][j])
                 id = min(4, id)#self.getID(game_map[i][j])
                 # id = max(0, id)
                 # print(n_row, n_col, id, self.img[Type(id)])
                 if id != 0:
+                    if id < -3:
+                        display.blit(self.img[Type.ANNOUNCE_VIEW], (j * block, i * block))
+                        continue
                     if Type(id) == Type.HIDER:
                         display.blit(self.img[Type.STREET_IN_HIDER_VIEW], (j * block, i * block))
                     
@@ -75,7 +82,7 @@ class GraphicPygame:
         textRect.center =((WINDOW_SIZE[0] - extend_for_text // 2), WINDOW_SIZE[1] // 8)
         display.blit(text, textRect)
         
-        pg.time.Clock().tick(10)
+        pg.time.Clock().tick(time_tick)
         screen.blit(pg.transform.scale(display, SCREEN_SIZE), (0, 0))
         pg.display.update()
         string_image = pg.image.tostring(screen, 'RGB')
