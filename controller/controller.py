@@ -36,7 +36,7 @@ class GameController:
             player.set_position(pos)
             player.set_id(i)
             self.map.set_player_position(player, i)
-        self.map.print_map()
+        # self.map.print_map()
         
     def run_turn(self, turn_id):
         player = self.get_player(turn_id)
@@ -78,7 +78,7 @@ class GameController:
                     print("Winner is ", winner)
                     break
             turn_id = (turn_id + 1) % (len(self.lst_player))
-            # self.time -= 1
+            self.time -= 1 * (turn_id == 0)
         pass
         self.graphic.extract_video()
         self.graphic.reset_screen()
@@ -91,6 +91,7 @@ class GameController:
         if (len(alive) == 1):
             return alive[0]
         return None
+
     def take_turn(self, player):
         player_view = self.map.get_view(player)
         direction = player.move(player_view)

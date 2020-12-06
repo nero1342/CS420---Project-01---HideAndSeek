@@ -20,7 +20,7 @@ player:
         count: 1
         args:
             movable: False 
-            view_range: 3
+            view_range: 2
 
     
     # ... more metrics

@@ -67,6 +67,8 @@ while loop:
                 # os.startfile(map_name)
             if event.key == K_d:
                 map1 = map_to_list()
+            if event.key == K_0:
+                typeTile = "0"
             if event.key == K_1:
                 typeTile = "1"
             if event.key == K_2:

@@ -8,6 +8,7 @@ class Seeker(Player):
         super().__init__(*args, **kwargs)
         self.visited_map = None
         self.value = -2
+
     def move(self, view):
         self.update_own_map(view)
         return self.heuristic_level1()
@@ -23,11 +24,13 @@ class Seeker(Player):
             for j in range(len(view.map[0])):
                 if (view.map[i][j] > 2):
                     self.visited_map.map[i][j] = view.map[i][j]
-                elif (view.map[i][j] == -1 and self.visited_map.map[i][j] == 0):
+                elif (view.map[i][j] == -1):
                     self.visited_map.map[i][j] = -1
+                    # if self.visited_map.map[i][j] == 0 or :
+                    #     self.visited_map.map[i][j] = -1
                 if (self.visited_map.map[i][j] == self.id + 3 and view.map[i][j] < 2):
                     self.visited_map.map[i][j] = -1
-        self.visited_map.print_map()
+        # self.visited_map.print_map()
     
     def heuristic_level1(self):
         curr_map = self.visited_map.map
@@ -69,12 +72,13 @@ class Seeker(Player):
                         best_val = h[v[0]][v[1]] + d[v[0]][v[1]]
                         best_target = v 
         
-        print("Best targer:", best_target[0], best_target[1], best_val)
+        print("Best target:", best_target[0], best_target[1], best_val)
         while (trace[best_target[0]][best_target[1]][0] != self.position):
             best_target = trace[best_target[0]][best_target[1]][0]
         
         return trace[best_target[0]][best_target[1]][1]
 
         
+    
         
 

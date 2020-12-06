@@ -5,7 +5,7 @@ from graphic import *
 import os
 import yaml 
 import pprint
-
+import glob 
 def get_function(name):
     return globals()[name]
 
@@ -30,6 +30,10 @@ def get_level_list():
         name = name.replace('_', ' ')
         level_list.append((name, i, f))
     return level_list
+
+def get_map_list():
+    lst = glob.glob('data_maps/*.png')
+    print(lst)
 
 def get_config(config_path):
     config = yaml.load(open(config_path, 'r'), Loader=yaml.Loader)

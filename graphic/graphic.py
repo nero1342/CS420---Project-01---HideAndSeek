@@ -1,4 +1,6 @@
 import pygame as pg 
+from pygame._sdl2.video import Window
+
 from pygame.locals import *
 import numpy as np 
 import os 
@@ -27,23 +29,34 @@ class GraphicPygame:
         self.img[Type.HIDER2] = pg.image.load(os.path.join(data_image_dir, "monkey2.png"))
         pg.init() 
         pg.display.set_caption('Hide and Seek')
-        
+        window = Window.from_display_module()
+        window.position = (0, 0)
         self.whole_game = []
+        self.cnt  = 0
     def draw(self, game_map):
         block = 17
         n_row = len(game_map)
         n_col = len(game_map[0])
-        WINDOW_SIZE = (n_col * block * 2 + 10, n_row * block * 2 + 10)
+        extend_for_text = 150
+        WINDOW_SIZE = (n_col * block + 10 + extend_for_text, n_row * block + 10)
+        SCREEN_SIZE = (WINDOW_SIZE[0] * 2, WINDOW_SIZE[1] * 2)
+        
         self.WS = WINDOW_SIZE
-        screen = pg.display.set_mode(WINDOW_SIZE, 0, 32)
-        display = pg.Surface((WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2))
-        display.fill((0, 0, 0))
+        screen = pg.display.set_mode(SCREEN_SIZE, 0, 32)
+        display = pg.Surface((WINDOW_SIZE))
+        black = (0, 0, 0)
+        white = (255, 255, 255)
+        green = (0, 255, 0)
+        blue = (0, 0, 128)
+        display.fill(black)
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
         for i in range(n_row):
             for j in range(n_col):
-                id = min(4, int(game_map[i][j]))#self.getID(game_map[i][j])
+                id = max(-2, int(game_map[i][j]))#self.getID(game_map[i][j])
+                id = min(4, id)#self.getID(game_map[i][j])
                 # id = max(0, id)
                 # print(n_row, n_col, id, self.img[Type(id)])
                 if id != 0:
@@ -54,11 +67,19 @@ class GraphicPygame:
                         display.blit(self.img[Type.STREET_IN_SEEKER_VIEW], (j * block, i * block))
                     display.blit(self.img[Type(id)], (j * block, i * block))
         
+        self.cnt += 1
+        font = pg.font.Font('freesansbold.ttf', 10)
+        text = font.render('Time remain: {}'.format(self.cnt), True, green, black)
+        textRect = text.get_rect()
+        # set the center of the rectangular object.
+        textRect.center =((WINDOW_SIZE[0] - extend_for_text // 2), WINDOW_SIZE[1] // 8)
+        display.blit(text, textRect)
+        
         pg.time.Clock().tick(10)
-        screen.blit(pg.transform.scale(display, WINDOW_SIZE), (0, 0))
+        screen.blit(pg.transform.scale(display, SCREEN_SIZE), (0, 0))
         pg.display.update()
         string_image = pg.image.tostring(screen, 'RGB')
-        temp_surf = pg.image.fromstring(string_image,WINDOW_SIZE,'RGB' )
+        temp_surf = pg.image.fromstring(string_image,SCREEN_SIZE,'RGB' )
         tmp_arr = pg.surfarray.array3d(temp_surf)
         self.whole_game.append(tmp_arr)
 
@@ -73,8 +94,9 @@ class GraphicPygame:
         seconds = 10
         
         fourcc = VideoWriter_fourcc(*'MP42')
-        level_name = 'test' # must change to name of level
-        path_to_save = os.path.join('./outputs', level_name, 'avi')
+        num_file = len(os.listdir('./outputs'))
+        level_name = 'test' + str(num_file).zfill(3) # must change to name of level
+        path_to_save = os.path.join('./outputs', level_name + '.avi')
         video = VideoWriter(path_to_save, fourcc, float(FPS), (width, height))
 
         for i, frame in enumerate(self.whole_game):
@@ -84,6 +106,6 @@ class GraphicPygame:
             video.write(frame)
 
         video.release()
-    
+        print("Extracted successfully.")
     def reset_screen(self):
         pg.display.set_mode((400, 300), 0, 32)

@@ -101,8 +101,8 @@ class GameMap:
                     view.map[i][j] = 0
         for p in range(4):
             lst = []
-            for i in range(r + 1):
-                for j in range(r + 1):
+            for i in range(4):
+                for j in range(4):
                     pos = (i * dirx[p] + x, j * diry[p] + y) 
                     lst.append(pos)
             in_view = [0] * len(lst)
@@ -117,8 +117,10 @@ class GameMap:
                     view.map[pos[0]][pos[1]] = -1
                 else:
                     view.map[pos[0]][pos[1]] = self.map[pos[0]][pos[1]]
+                if in_view[i] == player.view_range + 1:
+                    continue
                 for j in self.nxt[i]:
-                    in_view[j] = 1
+                    in_view[j] = in_view[i] + 1
             print(in_view)
         return view
     
@@ -126,13 +128,15 @@ class GameMap:
         dirx = (1, 1, -1, -1)
         diry = (1, -1, 1, -1)
         view = copy.deepcopy(self)
-        for player in players:
+        for player in reversed(players):
+            if not player.movable:
+                continue 
             x, y = player.position
             r = player.view_range 
             for p in range(4):
                 lst = []
-                for i in range(r + 1):
-                    for j in range(r + 1):
+                for i in range(4):
+                    for j in range(4):
                         pos = (i * dirx[p] + x, j * diry[p] + y) 
                         lst.append(pos)
                 in_view = [0] * len(lst)
@@ -144,11 +148,14 @@ class GameMap:
                     if (self.inside(pos) and self.map[pos[0]][pos[1]] in self.lst_obs):
                         continue
                     if (self.map[pos[0]][pos[1]] == 0):
-                        view.map[pos[0]][pos[1]] = -1
+                        #if not view.map[pos[0]][pos[1]] >= 0:
+                            view.map[pos[0]][pos[1]] = -player.id - 1
                     else: 
                         view.map[pos[0]][pos[1]] = self.map[pos[0]][pos[1]]
+                    if in_view[i] == player.view_range + 1:
+                        continue
                     for j in self.nxt[i]:
-                        in_view[j] = 1
+                        in_view[j] = in_view[i] + 1
                 # print(in_view)
         return view
 
@@ -178,9 +185,14 @@ class GameMap:
                 if (player.__class__.__name__ == "Seeker" 
                     and self.id[self.map[newX][newY]] == "Hider"):
                     ret.append(self.map[newX][newY] - 3) 
-                    print("Seeker -> Hider")
+                    print("Seeker -> Hider {} ".format(ret[0]))
+                if (player.__class__.__name__ == "Hider"
+                    and self.id[self.map[newX][newY]] == "Seeker"):
+                    ret.append(player.id) 
+                    print("Hider {} suicided.".format(player.id))
             print("Move from ({}, {}) to ({},{})".format(x, y, newX, newY))
-            player.set_position((newX, newY))
-            self.map[newX][newY] = self.map[x][y]
+            if not player.id in ret:
+                player.set_position((newX, newY))
+                self.map[newX][newY] = self.map[x][y]
             self.map[x][y] = 0
         return ret

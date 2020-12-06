@@ -5,6 +5,7 @@ class Player:
         self.view_range = view_range
         # self.position = position
         self.view_range
+        self.died = False 
     def set_position(self, position):
         self.position = position
 
@@ -12,7 +13,9 @@ class Player:
         self.id = id 
            
     def dead(self):
+        self.died = True 
         self.movable = False 
+
     def move(self, direction):
         return 
     
