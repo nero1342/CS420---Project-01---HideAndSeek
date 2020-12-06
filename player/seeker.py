@@ -85,9 +85,12 @@ class Seeker(Player):
                         best_target = v 
         
         # print("Best target:", best_target[0], best_target[1], best_val)
-        while (trace[best_target[0]][best_target[1]][0] != self.position):
-            best_target = trace[best_target[0]][best_target[1]][0]
-        
+        try:
+            while (trace[best_target[0]][best_target[1]][0] != self.position):
+                best_target = trace[best_target[0]][best_target[1]][0]
+        except Exception:
+            return 1
+            pass
         return trace[best_target[0]][best_target[1]][1]
 
         

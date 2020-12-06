@@ -16,7 +16,7 @@ class GameController:
         config = get_config(self.config_path)
         self.time = config['controller']['time']
         self.graphic = get_instance(config['graphic'])
-        self.map = get_instance(config['map']) 
+        self.map = get_instance(config['map'])
         self.players = {}
         for pcfg in config['player']:
             for it in range(pcfg['count']):
@@ -28,6 +28,7 @@ class GameController:
                 self.type_player_alive[player.__class__.__name__] += 1
             else:
                 self.type_player_alive[player.__class__.__name__] = 1
+
         # print(self.type_player_alive)
         # print(self.lst_player)
 
@@ -38,6 +39,8 @@ class GameController:
             player.set_id(i)
             # print(i, self.lst_player[i])
             self.map.set_player_position(player, i)
+        
+        self.graphic.set_base_score((len(self.lst_player) - 1) * 100)
         # self.map.print_map()
         
     def run_turn(self, turn_id):
@@ -82,8 +85,9 @@ class GameController:
             if self.run_turn(turn_id):
                 if turn_id == 0:
                     announce_turn -= 1
+                    self.graphic.score -= 1
                     self.time -= 1
-                    self.graphic.draw(self.map.get_system_view(self.players.values()).map, time_tick = 10)
+                self.graphic.draw(self.map.get_system_view(self.players.values()).map, time_tick = 10)
                 # self.graphic.draw(self.map.get_system_view(self.players.values()).map)
                 # continue
                 #self.graphic.draw(self.get_player(turn_id).visited_map.map)
@@ -108,7 +112,7 @@ class GameController:
                 possible_cell = []
                 for i in range(-3, 4):
                     for j in range(-3, 4):
-                        if abs(i) + abs(j) > 3 or i + j == 0:
+                        if abs(i) + abs(j) > player.view_range or i + j == 0:
                             continue
                         cell = (pos[0] + i, pos[1] + j)
                         if self.map.valid((pos[0] + i, pos[1] + j)) and self.map.is_announce_cell(cell):
@@ -131,6 +135,7 @@ class GameController:
         player_view = self.map.get_view(player)
         direction = player.move(player_view)
         lst_dead = self.map.move(player, direction)
+        self.graphic.score += len(lst_dead) * 20
         [self.get_player(id).dead() for id in lst_dead]
         if not player.is_dead and not self.map.alive(player):
             self.map.print_map()

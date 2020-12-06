@@ -5,6 +5,8 @@ from pygame.locals import *
 import numpy as np 
 import os 
 from enum import Enum 
+import random
+
 class Type(Enum):
     ANNOUNCE_VIEW = -4
     STREET_IN_OVERLAP_VIEW = -3
@@ -37,6 +39,9 @@ class GraphicPygame:
         window.position = (0, 0)
         self.whole_game = []
         self.cnt  = 0
+        self.score = 0
+    def set_base_score(self, score):
+        self.score = score
     def draw(self, game_map, time_tick = 60):
         block = 17
         n_row = len(game_map)
@@ -74,9 +79,9 @@ class GraphicPygame:
                         display.blit(self.img[Type.STREET_IN_SEEKER_VIEW], (j * block, i * block))
                     display.blit(self.img[Type(id)], (j * block, i * block))
         
-        self.cnt += 1
+        self.cnt += time_tick
         font = pg.font.Font('freesansbold.ttf', 10)
-        text = font.render('Time remain: {}'.format(self.cnt), True, green, black)
+        text = font.render('Time Elapsed: {} - Score: {}'.format(self.cnt // 60, self.score), True, green, black)
         textRect = text.get_rect()
         # set the center of the rectangular object.
         textRect.center =((WINDOW_SIZE[0] - extend_for_text // 2), WINDOW_SIZE[1] // 8)
@@ -95,24 +100,29 @@ class GraphicPygame:
         import numpy as np
         from cv2 import VideoWriter, VideoWriter_fourcc
 
-        width = self.WS[0]
-        height = self.WS[1]
+        img_size = self.whole_game[0].shape[:-1]
+        print(img_size)
         FPS = 10
         seconds = 10
         
         fourcc = VideoWriter_fourcc(*'MP42')
         num_file = len(os.listdir('./outputs'))
-        level_name = 'test' + str(num_file).zfill(3) # must change to name of level
+        level_name = 'level_1_map_05' # must change to name of level
         path_to_save = os.path.join('./outputs', level_name + '.avi')
-        video = VideoWriter(path_to_save, fourcc, float(FPS), (width, height))
+        video = VideoWriter(path_to_save, fourcc, float(FPS), img_size)
 
+        draw = False
         for i, frame in enumerate(self.whole_game):
             print("Extract frame {}".format(i))
             frame = frame.transpose(1, 0, 2)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             video.write(frame)
-
+            if random.randint(0, 100) < 30 and not draw:
+                draw = True
+                cv2.imwrite('map_01.png', frame)
+            
         video.release()
         print("Extracted successfully.")
+        print(self.cnt / 60 * 1000, self.score)
     def reset_screen(self):
         pg.display.set_mode((400, 300), 0, 32)

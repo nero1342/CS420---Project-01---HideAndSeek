@@ -9,7 +9,7 @@ graphic:
 map:
     name: GameMap
     args:
-        path: data_maps/map_2.txt
+        path: data_maps/map_5.txt
 player:
     -   name: Seeker
         count: 1

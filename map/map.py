@@ -2,6 +2,7 @@ import random
 from enum import Enum
 
 import copy 
+import os
 
 class Obstacle(Enum):
     WALL = 1
@@ -134,7 +135,7 @@ class GameMap:
         diry = (1, -1, 1, -1)
         view = copy.deepcopy(self)
         for player in reversed(players):
-            if not player.movable:
+            if player.is_dead:
                 continue 
             x, y = player.position
             # if player.is_dead:
@@ -194,6 +195,7 @@ class GameMap:
         free = [(i, j) for i in range(self.size[0]) for j in range(self.size[1]) if self.map[i][j] == 0]
         indice = random.choice(free)
         return indice
+
     def is_announce_cell(self, pos):
         return True # self.map[pos[0]][pos[1]] not in [1, 2, 3] 
     def set_player_position(self, player, id):
